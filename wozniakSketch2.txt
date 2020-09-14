@@ -1,0 +1,136 @@
+let myVideo;
+let threshSlider;
+let bgButton;
+let bgPixels = [];
+
+let bgImage;
+
+function preLoad() {
+  bgImage = loadImage('
+  
+  
+}
+
+function setup() {
+  createCanvas(640, 480);
+  
+  myVideo = createCapture(VIDEO);
+  myVideo.size(width, height);
+  myVideo.hide();
+  
+  threshSlider = createSlider(0,255, 100);
+  
+  bgButton = createButton('set bg'); bgButton.mousePressed(setBG);
+}
+
+function setBG() {
+  console.log('im working');
+  myVideo.loadPixels();
+  const currentPixels = myVideo.pixels;
+  
+  for(let i = 0; i<currentPixels.length;i++) {
+    bgPixels[i] = currentPixels[i];
+    
+    
+  }
+  
+  
+}
+
+function draw() {
+  
+  myVideo.loadPixels();
+  
+  const currentPixels = myVideo.pixels;
+  let threshValue = threshSlider.value();
+  
+  for(let y = 0; y< height; y++){
+    for(let x = 0; x < width; x++){
+      const i = (y*width+x)*4;
+  
+  
+      const rDiff = abs(currentPixels[i+0] - bgPixels[i+0]);
+      const gDiff = abs(currentPixels[i+1] - bgPixels[i+1]);
+      const bDiff = abs(currentPixels[i+2] - bgPixels[i+2]);
+                        
+                        
+   
+      
+      avgDiff = (rDiff + gDiff + bDiff)/3; // 0-22
+      
+
+      if (avgDiff >= 80 && avgDiff < 255) {
+        
+        currentPixels[i + 0] = 0;
+        currentPixels[i + 1] = 0;
+        currentPixels[i + 2] = 255;
+        
+        if(currentPixels[i + 0] == 0) {
+          currentPixels[i+0] = pastPixels[i+0];
+        }
+        if(currentPixels[i + 1] == 0) {
+          currentPixels[i+1] = pastPixels[i+1];
+        }
+        if(currentPixels[i + 2] == 255) {
+          currentPixels[i+2] = pastPixels[i + 2];
+        }
+        
+        if(currentPixels[i + 0] > 0) {
+          currentPixels[i+0] = 0;
+        }
+        if(currentPixels[i + 1] > 0) {
+          currentPixels[i+1] = 0;
+        }
+        if(currentPixels[i + 2] < 255) {
+          currentPixels[i+2] = 255;
+        }
+        
+        if(pastPixels[i + 0] > 0) {
+          pastPixels[i+0] = 0;
+        }
+        if(pastPixels[i + 1] > 0) {
+          pastPixels[i+1] = 0;
+        }
+        if(pastPixels[i + 2] < 255) {
+          pastPixels[i+2] = 255;
+        }
+        
+        currentPixels[i + 3] = 100;
+        
+        
+      } else if (avgDiff >= 40 && avgDiff < 80) {
+        currentPixels[i + 0] = 255; // to show the natural video color
+        currentPixels[i + 1] = 0; // comment out
+        currentPixels[i + 2] = 0; // these three lines
+        // an alpha of 100, which creates some nice smoothing
+        
+        if(currentPixels[i + 0] < 255) {
+          currentPixels[i+0] = 255;
+        }
+        if(currentPixels[i + 1] > 0) {
+          currentPixels[i+1] = 0;
+        }
+        if(currentPixels[i + 2] > 0) {
+          currentPixels[i+2] = 0;
+        }
+        
+        if(pastPixels[i + 0] < 255) {
+          pastPixels[i+0] = 255;
+        }
+        if(pastPixels[i + 1] > 0) {
+          pastPixels[i+1] = 0;
+        }
+        if(pastPixels[i + 2] > 0) {
+          pastPixels[i+2] = 0;
+        }
+
+
+
+
+              }
+  }
+      
+  myVideo.updatePixels();
+  image(myVideo,0,0,width,height);
+        
+        }
